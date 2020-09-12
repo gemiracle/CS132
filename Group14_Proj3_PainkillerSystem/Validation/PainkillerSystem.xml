@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?><!DOCTYPE nta PUBLIC '-//Uppaal Team//DTD Flat System 1.1//EN' 'http://www.it.uu.se/research/group/darts/uppaal/flat-1_1.dtd'><nta><declaration>// Place global declarations here.
+clock x;
+int y=0;
+chan valueChanged;
+chan confirm;
+chan start;
+chan stop;
+chan request;
+// scaled by 100
+int perHour=0,perDay=0;
+int bolus=20,base=1;
+</declaration><template><name x="5" y="5">Patient</name><declaration>// Place local declarations here.
+</declaration><location id="id0" x="-80" y="-72"><name x="-112" y="-56">waitReque</name><urgent/></location><location id="id1" x="-80" y="-160"><name x="-90" y="-190">Init</name></location><init ref="id1"/><transition><source ref="id0"/><target ref="id1"/><label kind="guard" x="-464" y="-136">(perHour+bolus&lt;=100)&amp;&amp;(perDay+bolus&lt;=300)</label><label kind="assignment" x="-336" y="-120">perHour=perHour+bolus,
+perDay=perDay+bolus</label><nail x="-168" y="-72"/><nail x="-168" y="-160"/></transition><transition><source ref="id0"/><target ref="id1"/><label kind="guard" x="16" y="-136">(perHour+bolus&gt;100)||(perDay+bolus&gt;300)</label><nail x="8" y="-72"/><nail x="8" y="-160"/></transition><transition><source ref="id1"/><target ref="id0"/><label kind="synchronisation" x="-136" y="-128">request?</label></transition></template><template><name>Physician</name><declaration>int newBolus;
+int newBase;</declaration><location id="id2" x="24" y="-320"><name x="0" y="-352">injecting</name><label kind="invariant" x="-128" y="-368">(perHour+bolus&lt;=100)&amp;&amp;(perDay+bolus&lt;=300)</label></location><location id="id3" x="24" y="-232"><name x="40" y="-240">waitInjec</name><urgent/></location><location id="id4" x="-208" y="-232"><name x="-296" y="-248">waitChange</name><urgent/></location><location id="id5" x="-96" y="-232"><name x="-104" y="-216">Init</name></location><init ref="id5"/><transition><source ref="id2"/><target ref="id5"/><label kind="guard" x="-200" y="-344">(perHour==100)||(perDay==300)</label><nail x="-96" y="-320"/></transition><transition><source ref="id2"/><target ref="id2"/><label kind="assignment" x="112" y="-336">perHour=perHour+base,
+perDay=perDay+base</label><nail x="96" y="-296"/><nail x="112" y="-320"/></transition><transition><source ref="id3"/><target ref="id5"/><label kind="guard" x="-112" y="-136">(perHour+base&gt;100)||(perDay+base&gt;300)</label><nail x="24" y="-136"/></transition><transition><source ref="id2"/><target ref="id5"/><label kind="synchronisation" x="-56" y="-296">stop?</label></transition><transition><source ref="id4"/><target ref="id5"/><label kind="guard" x="-400" y="-296">(newBolus&gt;50)||(newBase&gt;10)</label><nail x="-208" y="-328"/></transition><transition><source ref="id4"/><target ref="id5"/><label kind="guard" x="-488" y="-184">(20&lt;=newBolus&lt;=50)&amp;&amp;(1&lt;=newBase&lt;=10)</label><label kind="synchronisation" x="-264" y="-200">confirm?</label><label kind="assignment" x="-416" y="-168">bolus=newBolus,base=newBase</label><nail x="-208" y="-128"/></transition><transition><source ref="id3"/><target ref="id2"/><label kind="guard" x="24" y="-288">(perHour+base&lt;=100)&amp;&amp;(perDay+base&lt;=300)</label></transition><transition><source ref="id5"/><target ref="id3"/><label kind="synchronisation" x="-56" y="-256">start?</label></transition><transition><source ref="id5"/><target ref="id4"/><label kind="synchronisation" x="-208" y="-256">valueChanged?</label></transition></template><template><name>Updating</name><location id="id6" x="48" y="-128"><name x="64" y="-144">day</name><urgent/></location><location id="id7" x="-184" y="-128"><name x="-194" y="-158">hour</name><urgent/></location><location id="id8" x="-64" y="-128"><name x="-48" y="-120">Init</name></location><init ref="id8"/><transition><source ref="id6"/><target ref="id8"/><label kind="assignment" x="-32" y="-240">y=0,
+perDay=0</label><nail x="48" y="-200"/><nail x="-64" y="-200"/></transition><transition><source ref="id7"/><target ref="id8"/><label kind="assignment" x="-160" y="-96">x=0,
+y=y+1,
+perHour=0</label><nail x="-184" y="-48"/><nail x="-64" y="-48"/></transition><transition><source ref="id8"/><target ref="id6"/><label kind="guard" x="-32" y="-152">y==24</label></transition><transition><source ref="id8"/><target ref="id7"/><label kind="guard" x="-144" y="-152">x==60</label></transition></template><system>// Place template instantiations here.
+
+
+// List one or more processes to be composed into a system.
+system Patient,Physician,Updating;</system></nta>
